@@ -1,0 +1,126 @@
+---
+title: "Practical 0: Reproducible research in R"
+author: "Claire Thiessen"
+date: "2025-05-14"
+output: html_document
+---
+
+
+#loading required packages into R
+library(tidyverse) 
+library(datasauRus)
+
+## Data
+
+The data frame we will be working with today is called `datasaurus_dozen` and it's in the `datasauRus` package. Actually, this single data frame contains 13 datasets, designed to show us why data visualisation is important and how summary statistics alone can be misleading. The different datasets are maked by the `dataset` variable.
+
+To find out more about the dataset, type the following in your Console: `?datasaurus_dozen`. A question mark before the name of an object will always bring up its help file. This command must be ran in the Console.
+
+**1. Based on the help file, how many rows and how many columns does the `datasaurus_dozen` file have? What are the variables included in the data frame? (this can be hardcoded)**
+
+Let's take a look at what these datasets are. To do so we can make a *frequency table* of the dataset variable:
+
+```{r}
+datasaurus_dozen %>%
+  count(dataset)
+```
+
+The original Datasaurus (`dino`) was created by Alberto Cairo in [this great blog post](http://www.thefunctionalart.com/2016/08/download-datasaurus-never-trust-summary.html). The other Dozen were generated using simulated annealing and the process is described in the paper *Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics* through Simulated Annealing by Justin Matejka and George Fitzmaurice. In the paper, the authors simulate a variety of datasets that the same summary statistics to the Datasaurus but have very different distributions.
+
+## Data visualization and summary
+
+**2. Plot `y` vs. `x` for the `dino` dataset. Then, calculate the correlation coefficient between `x` and `y` for this dataset.**
+
+
+```{r}
+dino_data <- datasaurus_dozen %>%
+  filter(dataset == "dino")
+```
+
+Next, we need to visualize these data. We will use the `ggplot` function for this. Its first argument is the data you're visualizing. Next we define the `aes`thetic mappings. In other words, the columns of the data that get mapped to certain aesthetic features of the plot, e.g. the `x` axis will represent the variable called `x` and the `y` axis will represent the variable called `y`. Then, we add another layer to this plot where we define which `geom`etric shapes we want to use to represent each observation in the data. In this case we want these to be points,m hence `geom_point`.
+
+```{r fig.fullwidth=TRUE}
+ggplot(data = dino_data, mapping = aes(x = x, y = y)) +
+  geom_point()
+```
+
+
+```{r, eval=FALSE}
+dino_data %>%
+  summarize(r = cor(x, y))
+```
+
+**3. Plot `y` vs. `x` for the `star` dataset. You can (and should) reuse code we introduced above, just replace the dataset name with the desired dataset. Then, calculate the correlation coefficient between `x` and `y` for this dataset. How does this value compare to the `r` of `dino`?**
+```{r}
+#creating new data frame with just the star data
+star_data <- datasaurus_dozen %>%
+  filter(dataset == "star")
+
+#plotting the star data points
+ggplot(data = star_data, mapping = aes(x = x, y = y)) +
+  geom_point()
+
+#calculating correlation coefficient between x and y of the star dataset
+star_data %>%
+  summarize(r = cor(x, y))
+```
+
+
+**4. Plot `y` vs. `x` for the `circle` dataset. You can (and should) reuse code we introduced above, just replace the dataset name with the desired dataset. Then, calculate the correlation coefficient between `x` and `y` for this dataset. How does this value compare to the `r` of `dino`?**
+```{r}
+#creating new data frame with just the circle data
+circle_data <- datasaurus_dozen %>%
+  filter(dataset == "star")
+
+#plotting the circle data points
+ggplot(data = circle_data, mapping = aes(x = x, y = y)) +
+  geom_point()
+
+#calculating correlation coefficient between x and y of the circle dataset
+circle_data %>%
+  summarize(r = cor(x, y))
+```
+
+Facet by the dataset variable, placing the plots in a 3 column grid, and don't add a legend.
+
+**5. Finally, let's plot all datasets at once. In order to do this we will make use of facetting.**
+
+```{r all-viz, eval=FALSE, fig.fullwidth=TRUE}
+ggplot(datasaurus_dozen, aes(x = x, y = y, color = dataset))+
+  geom_point()+
+  facet_wrap(~ dataset, ncol = 3) +
+  theme(legend.position = "none")
+```
+
+And we can use the `group_by` function to generate all correlation coefficients.
+
+```{r first-10-r, eval=FALSE}
+datasaurus_dozen %>%
+  group_by(dataset) %>%
+  summarize(r = cor(x, y))
+```
+
+You're done with the data analysis exercises, but we'd like you to do two more things:
+
+- **Resize your figures:** 
+
+Click on the gear icon in on top of the R Markdown document, and select "Output Options..." in the dropdown menu. In the pop up dialogue box go to the Figures tab and change the height and width of the figures, and hit OK when done. Then, knit your document and see how you like the new sizes. Change and knit again and again until you're happy with the figure sizes. Note that these values get saved in the YAML.
+
+You can also use different figure sizes for different figures. To do so click on the gear icon within the chunk where you want to make a change. Changing the figure sizes added new options to these chunks: `fig.width` and `fig.height`. You can change them by defining different values directly in your R Markdown document as well.
+
+- **Change the look of your report:** 
+
+Once again click on the gear icon in on top of the R Markdown document, and select "Output Options..." in the dropdown menu. In the General tab of the pop up dialogue box try out different syntax highlighting and theme options. Hit OK and knit your document to see how it looks. Play around with these until you're happy with the look.
+
+
+# Optional
+
+If you have time you can explore the different ways you can add styling to your rmarkdown document.
+
+Here is a [cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+and a [markdown cheatsheet](https://www.markdownguide.org/cheat-sheet/)
+
+---
+
+This set of lab exercises have been adapted from [Mine Çetinkaya-Rundel](https://twitter.com/minebocek)'s class [Introduction to Data Science](https://github.com/ids-s1-19) and [PM566](https://uscbiostats.github.io/PM566/)
